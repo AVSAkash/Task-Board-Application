@@ -1,73 +1,93 @@
-# React + TypeScript + Vite
+# Task Board Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a responsive, single-page task management application built with React, TypeScript, and Vite. It provides a complete solution for managing projects through boards, columns, and tasks, with all data persisted in the browser's local storage.
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+# Task Board Application
 
-## React Compiler
+**[Live Demo](https://task-board-application-eight.vercel.app/)**
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+This is a responsive, single-page task management application...
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Key Features for Evaluation
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+To help with the evaluation of this project, here are the core functionalities to test:
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+* **Full CRUD Operations**: The application supports creating, reading, updating, and deleting boards, columns, and tasks.
+* **Drag & Drop**: Tasks can be seamlessly reordered within the same column or moved to different columns.
+* **State Management**: A centralized React Context (`BoardContext`) manages the application's entire state.
+* **Data Persistence**: All data is saved to `localStorage`, ensuring that your work is not lost between browser sessions.
+* **Dynamic Filtering & Sorting**: Tasks within a board can be filtered by a search query, priority, or due date, and sorted by priority or due date.
+* **Component-Based Architecture**: The codebase is organized into logical, reusable components for maintainability.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+##  How to Run the Application Locally
+
+Follow these instructions to get the project set up and running on your local machine for development and testing.
+
+### **Step 1: Prerequisites**
+
+Ensure you have the following installed on your system:
+* **Node.js** (v16.x or higher)
+* **npm** (Node Package Manager)
+
+### **Step 2: Clone the Repository**
+
+Open your terminal or command prompt and clone the project repository to your local machine.
+
+```sh
+git clone [https://github.com/your-username/your-project-repo.git](https://github.com/your-username/your-project-repo.git)
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### **Step 3: Navigate to the Project Directory**
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Change your current directory to the newly cloned project folder.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```sh
+cd your-project-repo
 ```
+
+### **Step 4: Install Dependencies**
+
+Install all the necessary project dependencies defined in `package.json`.
+
+```sh
+npm install
+```
+
+### **Step 5: Start the Development Server**
+
+Run the following command to start the Vite development server.
+
+```sh
+npm run dev
+```
+
+The application should now be running. Your terminal will display the local URL, which is typically **`http://localhost:5173`**. Open this URL in your web browser to view the application.
+
+---
+
+##  Available Scripts
+
+This project comes with the following scripts pre-configured:
+
+* **`npm run dev`**: Starts the development server with Hot Module Replacement (HMR) enabled.
+* **`npm run build`**: Compiles and bundles the application for production into the `dist/` directory.
+* **`npm run preview`**: Serves the production build locally to test it before deployment.
+
+---
+
+##  Tech Stack
+
+* **Framework**: React 18
+* **Language**: TypeScript
+* **Build Tool**: Vite
+* **Styling**: Tailwind CSS
+* **Routing**: React Router v6
+* **Drag & Drop**: @hello-pangea/dnd
+* **Icons**: Lucide React
+* **Unique IDs**: UUID
