@@ -1,11 +1,13 @@
-/* src/index.css */
+/* Import Google Fonts for a consistent typography. */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
+/* Include Tailwind's base, components, and utilities styles. */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Define base styles for the application. */
 body {
   background-color: #f8fafc; /* Tailwind's slate-50 */
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', sans-serif; /* Apply the imported font. */
 }
