@@ -3,24 +3,24 @@ import { Draggable } from '@hello-pangea/dnd';
 import type { Task } from '../context/BoardContext';
 import { Pencil, Trash2, Calendar, User } from 'lucide-react';
 
-// Error Fix: The props interface was missing.
 interface TaskCardProps {
   task: Task;
-  index: number;
-  colId: string;
+  index: number; // The index of the task within its column.
+  colId: string; // The ID of the column this task belongs to.
   onEdit: (colId: string, taskId: string) => void;
   onDelete: (colId: string, taskId: string) => void;
 }
 
+// Maps task priorities to specific Tailwind CSS classes for styling.
 const priorityColors: Record<string, string> = {
   high: 'bg-red-100 text-red-800 border-red-200',
   medium: 'bg-amber-100 text-amber-800 border-amber-200',
   low: 'bg-green-100 text-green-800 border-green-200',
 };
 
-// Error Fix: Added the props and their types to the function signature.
 export default function TaskCard({ task, index, colId, onEdit, onDelete }: TaskCardProps) {
   return (
+    // Wrap the card with the Draggable component from @hello-pangea/dnd.
     <Draggable draggableId={task.id} index={index}>
       {(provided) => (
         <div
