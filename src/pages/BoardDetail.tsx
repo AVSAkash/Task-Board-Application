@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import { v4 as uuid } from 'uuid';
 import { DragDropContext } from '@hello-pangea/dnd';
 import type { DropResult } from '@hello-pangea/dnd';
-import Column from '../components/Column'; // Import the new Column component
+import Column from '../components/Column';
 
 export default function BoardDetail() {
   const context = useContext(BoardContext);
@@ -13,61 +13,66 @@ export default function BoardDetail() {
   
   const { boards, setBoards } = context;
   const { id } = useParams<{ id: string }>();
+  // Find the specific board being viewed from the global context using the URL parameter.
   const board = boards.find((b) => b.id === id);
 
+  // State for the "Add Column" input field.
   const [columnTitle, setColumnTitle] = useState('');
+
+  // State for filtering controls.
   const [searchQuery, setSearchQuery] = useState('');
   const [priorityFilter, setPriorityFilter] = useState<'all' | 'high' | 'medium' | 'low'>('all');
   const [dueDateFilter, setDueDateFilter] = useState('');
+
+  // State for sorting controls.
   const [sortOption, setSortOption] = useState<'none' | 'priority-high' | 'priority-low' | 'due-soon' | 'due-late'>('none');
 
+  // State to manage the visibility and data of the Add/Edit Task form.
+  // It holds the column ID and an optional task ID (if editing).
   const [showTaskForm, setShowTaskForm] = useState<{ colId: string; taskId?: string } | null>(null);
   const [taskForm, setTaskForm] = useState<Omit<Task, 'id'>>({
-    title: '',
-    description: '',
-    priority: 'medium',
-    dueDate: '',
-    createdBy: '',
+    title: '', description: '', priority: 'medium', dueDate: '', createdBy: '',
   });
 
   if (!board) return <p>Board not found</p>;
 
-  // All state management functions remain here in the parent component
+  // All state management functions are kept in this parent component to pass down to children.
+  
   const addColumn = () => {
     if (!columnTitle.trim()) return;
     const newCol: ColumnType = { id: uuid(), title: columnTitle, tasks: [] };
-    const updated = boards.map((b) =>
+    const updatedBoards = boards.map((b) =>
       b.id === board.id ? { ...b, columns: [...b.columns, newCol] } : b
     );
-    setBoards(updated);
+    setBoards(updatedBoards);
     setColumnTitle('');
   };
   
   const editColumn = (colId: string, newTitle: string) => {
-    const updated = boards.map((b) =>
+    const updatedBoards = boards.map((b) =>
       b.id === board.id
         ? { ...b, columns: b.columns.map((c) => (c.id === colId ? { ...c, title: newTitle } : c)) }
         : b
     );
-    setBoards(updated);
+    setBoards(updatedBoards);
   };
   
   const deleteColumn = (colId: string) => {
-    const updated = boards.map((b) =>
+    const updatedBoards = boards.map((b) =>
       b.id === board.id ? { ...b, columns: b.columns.filter((c) => c.id !== colId) } : b
     );
-    setBoards(updated);
+    setBoards(updatedBoards);
   };
   
+  // Handles both creating a new task and updating an existing one.
   const handleSaveTask = (colId: string, taskId?: string) => {
     if (!taskForm.title.trim()) return;
     let updatedBoards;
     if (taskId) {
+      // Logic for updating an existing task.
       updatedBoards = boards.map((b) =>
         b.id === board.id
-          ? {
-              ...b,
-              columns: b.columns.map((c) =>
+          ? { ...b, columns: b.columns.map((c) =>
                 c.id === colId
                   ? { ...c, tasks: c.tasks.map((t) => (t.id === taskId ? { ...t, ...taskForm } : t)) }
                   : c
@@ -76,54 +81,56 @@ export default function BoardDetail() {
           : b
       );
     } else {
+      // Logic for creating a new task.
       const newTask: Task = { id: uuid(), ...taskForm };
       updatedBoards = boards.map((b) =>
         b.id === board.id
-          ? {
-              ...b,
-              columns: b.columns.map((c) => (c.id === colId ? { ...c, tasks: [...c.tasks, newTask] } : c)),
+          ? { ...b, columns: b.columns.map((c) => (c.id === colId ? { ...c, tasks: [...c.tasks, newTask] } : c)),
             }
           : b
       );
     }
     setBoards(updatedBoards);
+    // Reset and hide the form after saving.
     setShowTaskForm(null);
     setTaskForm({ title: '', description: '', priority: 'medium', dueDate: '', createdBy: '' });
   };
   
   const deleteTask = (colId: string, taskId: string) => {
-    const updated = boards.map((b) =>
+    const updatedBoards = boards.map((b) =>
       b.id === board.id
-        ? {
-            ...b,
-            columns: b.columns.map((c) =>
+        ? { ...b, columns: b.columns.map((c) =>
               c.id === colId ? { ...c, tasks: c.tasks.filter((t) => t.id !== taskId) } : c
             ),
           }
         : b
     );
-    setBoards(updated);
+    setBoards(updatedBoards);
   };
 
+  // Main logic for handling the end of a drag-and-drop operation.
   const onDragEnd = (result: DropResult) => {
-    const { source, destination, draggableId } = result;
-    if (!destination) return;
-
-    if (source.droppableId === destination.droppableId && source.index === destination.index) return;
+    const { source, destination } = result;
+    if (!destination) return; // Dropped outside a valid target.
+    if (source.droppableId === destination.droppableId && source.index === destination.index) return; // Dropped in the same place.
     
     const sourceCol = board.columns.find(c => c.id === source.droppableId);
     const destCol = board.columns.find(c => c.id === destination.droppableId);
     if (!sourceCol || !destCol) return;
 
+    // Create copies of task arrays to avoid direct mutation.
     const sourceTasks = [...sourceCol.tasks];
     const destTasks = [...destCol.tasks];
+    // Remove the dragged task from its original location.
     const [movedTask] = sourceTasks.splice(source.index, 1);
     
     if (source.droppableId === destination.droppableId) {
+        // Task moved within the same column.
         sourceTasks.splice(destination.index, 0, movedTask);
         const newColumns = board.columns.map(c => c.id === sourceCol.id ? {...c, tasks: sourceTasks} : c);
         setBoards(boards.map(b => b.id === board.id ? {...b, columns: newColumns} : b));
     } else {
+        // Task moved to a different column.
         destTasks.splice(destination.index, 0, movedTask);
         const newColumns = board.columns.map(c => {
             if (c.id === sourceCol.id) return {...c, tasks: sourceTasks};
@@ -134,6 +141,7 @@ export default function BoardDetail() {
     }
   };
   
+  // Applies all active filters and sorting options to a list of tasks.
   const filterAndSortTasks = (tasks: Task[]) => {
     let result = tasks.filter(
       (t) =>
@@ -142,21 +150,25 @@ export default function BoardDetail() {
         (priorityFilter === 'all' || t.priority === priorityFilter) &&
         (dueDateFilter ? t.dueDate === dueDateFilter : true)
     );
-    const order = { high: 1, medium: 2, low: 3 };
+    
+    const priorityOrder = { high: 1, medium: 2, low: 3 };
+
     switch (sortOption) {
-      case 'priority-high': result.sort((a, b) => order[a.priority] - order[b.priority]); break;
-      case 'priority-low': result.sort((a, b) => order[b.priority] - order[a.priority]); break;
+      case 'priority-high': result.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]); break;
+      case 'priority-low': result.sort((a, b) => priorityOrder[b.priority] - priorityOrder[a.priority]); break;
       case 'due-soon': result.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()); break;
       case 'due-late': result.sort((a, b) => new Date(b.dueDate).getTime() - new Date(a.dueDate).getTime()); break;
     }
     return result;
   };
   
+  // Sets state to show the task form for adding a new task.
   const handleAddTask = (colId: string) => {
     setShowTaskForm({ colId });
     setTaskForm({ title: '', description: '', priority: 'medium', dueDate: '', createdBy: '' });
   };
   
+  // Sets state to show the task form for editing, pre-filling it with the task's data.
   const handleEditTask = (colId: string, taskId: string) => {
     const task = board.columns.find(c => c.id === colId)?.tasks.find(t => t.id === taskId);
     if(task) {
@@ -175,7 +187,6 @@ export default function BoardDetail() {
     <div className="p-6">
       <h1 className="text-3xl mb-4">{board.name}</h1>
 
-      {/* Filter and Sort Controls */}
       <div className="mb-4 flex gap-4 flex-wrap">
         <input className="border p-2 flex-1" placeholder="Search tasks..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
         <select className="border p-2" value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value as any)}>
@@ -187,7 +198,6 @@ export default function BoardDetail() {
         </select>
       </div>
       
-      {/* Add Column Form */}
       <div className="mb-4 flex gap-2">
         <input className="border p-2 flex-1" placeholder="New Column Title" value={columnTitle} onChange={(e) => setColumnTitle(e.target.value)} />
         <button className="bg-green-500 text-white px-4 py-2 rounded" onClick={addColumn}>Add Column</button>
