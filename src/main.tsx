@@ -7,7 +7,9 @@ import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
+    {/* BoardProvider makes the board state available to the entire app. */}
     <BoardProvider>
+      {/* BrowserRouter enables client-side routing. */}
       <BrowserRouter>
         <App />
       </BrowserRouter>
