@@ -10,25 +10,28 @@ interface BoardCardProps {
 }
 
 export default function BoardCard({ board, onSave, onDelete }: BoardCardProps) {
+  // Local state to manage the inline editing of the board's name.
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(board.name);
   const navigate = useNavigate();
 
+  // Saves the new board name by calling the parent's `onSave` function.
   const handleSave = () => {
-    if (!editValue.trim()) return;
+    if (!editValue.trim()) return; // Prevent saving empty names.
     onSave(board.id, editValue);
     setIsEditing(false);
   };
 
+  // Cancels the editing process and reverts the input value.
   const handleCancel = () => {
     setIsEditing(false);
     setEditValue(board.name);
   };
 
   return (
-    // Change: Better card styling with transitions and shadows
     <div className="bg-white p-5 rounded-lg shadow-md relative transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
       {isEditing ? (
+        // Conditional UI for when the user is editing the board name.
         <div>
           <input
             className="border border-slate-300 p-2 w-full mb-3 rounded-md focus:ring-2 focus:ring-indigo-500"
@@ -52,6 +55,7 @@ export default function BoardCard({ board, onSave, onDelete }: BoardCardProps) {
           </div>
         </div>
       ) : (
+        // Default display for the board card.
         <>
           <div
             className="cursor-pointer"
@@ -60,7 +64,6 @@ export default function BoardCard({ board, onSave, onDelete }: BoardCardProps) {
             <h2 className="text-xl font-bold text-slate-800">{board.name}</h2>
             <p className="text-sm text-slate-500 mt-1">{board.columns.length} columns</p>
           </div>
-          {/* Change: Icon buttons for a cleaner look */}
           <div className="absolute top-4 right-4 flex gap-2">
             <button
               className="text-slate-500 hover:text-amber-600 transition-colors p-1"
